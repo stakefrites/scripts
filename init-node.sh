@@ -12,10 +12,6 @@ serviceName="$2"
 #goLatestVersion="1.17.6"
 goLatestVersion="$1"
 
-function log() {
-    echo -e "${PURPLE}${BOLD}$*${RESET}"
-}
-
 function checkSudo() {
     echo "[*] Gonna check if you are root"
     if [[ $EUID -ne 0 ]]; then
@@ -137,28 +133,28 @@ function doAction() {
     checkSudo
     checkArgs "$@"
     echo ""
-    log "[*] Setting Requirements"
+    echo "[*] Setting Requirements"
     setRequirements
     echo ""
-    log "[*] Setting GO"
+    echo "[*] Setting GO"
     setupLatestGO
     echo ""
-    log "[*] Setting Users"
+    echo "[*] Setting Users"
     setUsers
     echo ""
-    log "[*] Setting Sudoers"
+    echo "[*] Setting Sudoers"
     sudoersFu
     echo ""
-    log "[*] Setting SSHkeys"
+    echo "[*] Setting SSHkeys"
     setupSSHkeys
     rootLogin
     echo ""
-    log "[*] Setting Timezone"
+    echo "[*] Setting Timezone"
     setTimezone
     echo ""
     echo "The END"
-    log "Please go delete init-node.sh script when re-logging in the /root dir"
-    log "Note: You won't be able to login with root again"
+    echo "Please go delete init-node.sh script when re-logging in the /root dir"
+    echo "Note: You won't be able to login with root again"
     askReboot
 }
 doAction "$@"
