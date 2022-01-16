@@ -136,7 +136,7 @@ function SetManualVAR() {
         echo "export CONFIG_HOME=$nodeHomeVAR"
         echo "export GIT_REPO=$gitRepo"
         echo "export VERSION=$version"
-        echo "export GENESIS_URL=$genesisUrl"
+        echo "export GENESIS_URL='$genesisUrl'"
     } >> "$HOME/.bashrc"
 }
 
@@ -182,9 +182,24 @@ function install_init_manual() {
     wget $GENESIS_URL > $CONFIG_HOME/config/genesis.json
     echo "Here is the node's id for sentry/validator config....."
     echo $($DAEMON tendermint show-node-id)
-
+    nano $CONFIG_HOME/config/config.toml
 }
 
+function queryRPC() {
+    echo "Querying the RPC server....."
+    read -p "What is the RPC server we trust : " RPC_SERVER
+    LAST_HEIGHT=$(wget -qO- $RPC_SERVER/commit | jq '.result.signed_header.header.height | tonumber')
+    TRUSTED_HEIGHT=$((LAST_HEIGHT-250))
+    TRUSTED_HASH=$(wget -qO- $RPC_SERVER/commit?height=$TRUSTED_HEIGHT| jq .result.signed_header.commit.block_id.hash)
+    echo "trust_hash=$TRUSTED_HASH"
+    echo "trust_height= $TRUSTED_HEIGHT"
+    dasel put int -f $HOME/.desmos/config/config.toml .statesync.trust_height $TRUSTED_HEIGHT
+    dasel put string -f $HOME/.desmos/config/config.toml .statesync.trust_hash $TRUSTED_HASH
+    dasel put string -f $HOME/.desmos/config/config.toml .statesync.rpc_servers "$RPC_SERVER,$RPC_SERVER"
+
+    
+}
+queryRPC
 
 
 
