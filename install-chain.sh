@@ -174,14 +174,14 @@ function install_init_manual() {
     git clone "$gitRepo.git"
     gitName=$(basename "$gitRepo")
     cd "$gitName"
-    git checkout "$version"
+    git checkout "v$version"
     make install
     echo "INITIALIZING THE NODE....."
     $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
     echo "GETTING THE GENESIS FILE....."
     wget $GENESIS_URL > $CONFIG_HOME/config/genesis.json
     echo "Here is the node's id for sentry/validator config....."
-    echo evmosd tendermint show-node-id
+    echo $($DAEMON tendermint show-node-id)
 
 }
 
