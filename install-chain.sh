@@ -14,6 +14,8 @@ if [ ! -d "$HOME/go" ]; then
     mkdir go
 fi
 read -p "Are we using the chain registry? yes-y | n-no : " isChainRegistry
+read -p "What type of node are we setting up? sentry-s | v-validator | a-archive: " nodeType
+read -p "What type of sync are we doig? statesync-s | snapshot-snap | genesis-g : " syncType
 
 function setupChainRepo() {
     mkdir temp
@@ -210,6 +212,14 @@ function cleanUp() {
 function doManual() {
     setVAR
     install_init_manual
+    if [ $syncType == statesync ] || [ $syncType == s ]; then
+        echo "We are state syncing"
+        queryRPC
+    elif [ $syncType == snapshot ] || [ $syncType == snap ]; then
+        echo "We will download the snapshot"
+    else 
+        echo "We are not syncing"
+    fi
 }
 
 function doRegistry() {
@@ -225,7 +235,7 @@ function doRegistry() {
 
 
 function doAction() {
-    if [ $isChainRegistry == yes || $isChainRegistry == y ]; then
+    if [ $isChainRegistry == yes ] || [ $isChainRegistry == y ]; then
         echo "We are using the chain registry"
         doRegistry
     else 
