@@ -47,12 +47,12 @@ function setupLatestGO() {
     rm go"$goLatestVersion".linux-amd64.tar.gz
     # Set GOPATH
     touch /etc/profile.d/$profileFile
-    GOPATH="/usr/local/go"
-    GOBIN="$GOPATH/bin"
+    GOBIN="/usr/local/go/bin"
+    GOROOT="\$HOME/go"
     {
         echo "export GOROOT=\$HOME/go"
         echo "export GO111MODULE=on"
-        echo "export GOPATH=$GOPATH"
+        echo "export GOPATH=\$HOME/go"
         echo "export GOBIN=$GOBIN"
         echo "export PATH=$GOBIN:$GOROOT/bin:$PATH"
     } >>/etc/profile.d/$profileFile
