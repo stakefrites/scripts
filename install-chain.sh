@@ -120,7 +120,7 @@ function setMiscVAR() {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export DAEMON=$daemonVAR"
         echo "export CONFIG_HOME=$nodeHomeVAR"
-        echo "export MONIKER=\"$MONIKER\""
+        echo "export MONIKER='$MONIKER'"
         echo "export WEBSITE='https://stakefrites.co'"
         echo "export DESCRIPTION='PoS Validators & Web3 developpers'"
         echo "export identity='7817CA2B0981F769'"
