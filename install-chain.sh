@@ -13,6 +13,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ ! -d "$HOME/go" ]; then
     mkdir go
 fi
+read -p "Are we using the chain registry? yes-y | n-no : " isChainRegistry
 
 function setupChainRepo() {
     mkdir temp
@@ -115,17 +116,11 @@ function setMiscVAR() {
     chainIDvar=$(jq ".chain_id" "$DIR/$myChainReg/chain.json")
     daemonVAR=$(jq ".daemon_name" "$DIR/$myChainReg/chain.json")
     nodeHomeVAR=$(jq ".node_home" "$DIR/$myChainReg/chain.json")
-    MONIKER="Stake Frites"
     {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export DAEMON=$daemonVAR"
         echo "export CONFIG_HOME=$nodeHomeVAR"
-        echo "export MONIKER='$MONIKER'"
-        echo "export WEBSITE='https://stakefrites.co'"
-        echo "export DESCRIPTION='PoS Validators & Web3 developpers'"
-        echo "export identity='7817CA2B0981F769'"
     } >> "$HOME/.bashrc"
-    source "$HOME/.bashrc"
 }
 
 function getChainRepo() {
@@ -143,13 +138,42 @@ function cleanUp() {
     rm -rf temp
 }
 
+function SetManualVAR() {
+    read -p "What is the chain ID : " chainIDvar
+    read -p "What is the daemon name : " daemonVAR
+    read -p "What is the node home : " nodeHomeVAR
+    {
+        echo "export CHAIN_ID=$chainIDvar"
+        echo "export DAEMON=$daemonVAR"
+        echo "export CONFIG_HOME=$nodeHomeVAR"
+    } >> "$HOME/.bashrc"
+}
+
+function setVAR() {
+    {
+        echo "export MONIKER='Stake Frites'"
+        echo "export WEBSITE='https://stakefrites.co'"
+        echo "export DESCRIPTION='PoS Validators & Web3 developpers'"
+        echo "export identity='7817CA2B0981F769'"
+    } >> "$HOME/.bashrc"
+
+    if [isChainRegistry == yes || isChainRegistry == y]; then
+        echo "We are using the chain registry"
+        SetMiscVar()
+    else 
+        echo "We need some information to continue"
+        SetManualVAR()
+    fi
+    source "$HOME/.bashrc"
+}
+
 function doAction() {
     setupChainRepo
     chooseChain
     getPeers
     getRPC
     getGenesis
-    setMiscVAR
+    setVAR
     getChainRepo
     cleanUp
 }
