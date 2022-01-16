@@ -117,6 +117,33 @@ function setTimezone() {
     sudo timedatectl set-timezone America/Toronto
 }
 
+function setServiceFile() {
+    read -p "What is the daemon'name?" DAEMON
+    
+cat << EOF > /etc/systemd/system/$serviceName.service
+[Unit]
+Description=$serviceName service
+After=network-online.target
+[Service]
+User=$newUserCrypto
+ExecStart=/root/go/bin/$DAEMON start
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+function setMount() {
+    read -p "How do we call our mount point?" MOUNT
+    mkdir -p /mnt/$MOUNT
+    mount -o discard,defaults,noatime /dev/sda /mnt/$MOUNT
+    echo '/dev/sda /mnt/$MOUNT ext4 defaults,nofail,discard 0 0' | sudo tee -a /etc/fstab
+    chown $newUserCrypto:$newUserCrypto -R /mnt/$MOUNT
+
+}
+
 function askReboot() {
     echo ""
     echo "Do you want to reboot ?"
@@ -143,6 +170,12 @@ function doAction() {
     echo ""
     echo "[*] Setting Sudoers"
     sudoersFu
+    echo ""
+    echo "[*] Setting the service file"
+    setServiceFile
+    echo ""
+    echo "[*] Configuring the mount point"
+    setMount
     echo ""
     echo "[*] Setting SSHkeys"
     setupSSHkeys

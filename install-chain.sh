@@ -14,7 +14,6 @@ if [ ! -d "$HOME/go" ]; then
     mkdir go
 fi
 read -p "Are we using the chain registry? yes-y | n-no : " isChainRegistry
-read -p "What type of node are we setting up? sentry-s | v-validator | a-archive: " nodeType
 read -p "What type of sync are we doig? statesync-s | snapshot-snap | genesis-g : " syncType
 
 function setupChainRepo() {
@@ -132,12 +131,15 @@ function SetManualVAR() {
     read -p "What is the gitrepo url : " gitRepo
     read -p "What is the recommended version : " version
     read -p "What is the genesis.json url (RAW) : " genesisUrl
+    read -p "What is the RPC server we trust : " RPC_SERVER
     {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export DAEMON=$daemonVAR"
         echo "export CONFIG_HOME=$nodeHomeVAR"
         echo "export GIT_REPO=$gitRepo"
         echo "export VERSION=$version"
+        echo "export RPC_SERVER=$RPC_SERVER"
+        echo "export RPC_SERVER_LIST=$RPC_SERVER,$RPC_SERVER"
         echo "export GENESIS_URL='$genesisUrl'"
     } >> "$HOME/.bashrc"
 }
@@ -148,6 +150,7 @@ function setVAR() {
         echo "export WEBSITE='https://stakefrites.co'"
         echo "export DESCRIPTION='PoS Validators & Web3 developpers'"
         echo "export identity='7817CA2B0981F769'"
+        echo "export OPERATOR_KEY='mateo"
     } >> "$HOME/.bashrc"
 
     if [ $isChainRegistry == yes ] || [ $isChainRegistry == y ]; then
@@ -180,6 +183,13 @@ function install_init_manual() {
     make install
     echo "INITIALIZING THE NODE....."
     $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
+    echo "CREATING THE OPERATOR KEY....."
+    read -p "Do we need to import an existing key? (y/n) : " isRecover
+    if [ $isRecover == y ] || [ $isRecover == yes ]; then
+        $DAEMON keys add "$OPERATOR_KEY" --recover
+    else
+        $DAEMON keys add "$OPERATOR_KEY"
+    fi
     echo "GETTING THE GENESIS FILE....."
     wget $GENESIS_URL > $CONFIG_HOME/config/genesis.json
     echo "Here is the node's id for sentry/validator config....."
@@ -189,7 +199,6 @@ function install_init_manual() {
 
 function queryRPC() {
     echo "Querying the RPC server....."
-    read -p "What is the RPC server we trust : " RPC_SERVER
     LAST_HEIGHT=$(wget -qO- $RPC_SERVER/commit | jq '.result.signed_header.header.height | tonumber')
     TRUSTED_HEIGHT=$((LAST_HEIGHT-250))
     TRUSTED_HASH=$(wget -qO- $RPC_SERVER/commit?height=$TRUSTED_HEIGHT| jq .result.signed_header.commit.block_id.hash)
@@ -203,7 +212,32 @@ function queryRPC() {
 }
 queryRPC
 
+function setPeerSettings() {
+    echo "We are setting up the peer settings....."
+    read -p "What type of node are we setting up? sentry-s | v-validator | a-archive: " nodeType
+    if [ $nodeType == sentry ] || [ $nodeType == s ]; then
+        echo "We are setting up a sentry node....."
+        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.pex true
+        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.addr_book_strict false
+    elif [ $nodeType == validator ] || [ $nodeType == v ]; then
+        echo "We are setting up a validator node....."
+        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.pex false
+        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.addr_book_strict false
+    else
+        echo "We are setting up an archive node....."
+    fi
+}
 
+function syncNode() {
+     if [ $syncType == statesync ] || [ $syncType == s ]; then
+        echo "We are state syncing"
+        queryRPC
+    elif [ $syncType == snapshot ] || [ $syncType == snap ]; then
+        echo "We will download the snapshot"
+    else 
+        echo "We are not syncing"
+    fi
+}
 
 function cleanUp() {
     rm -rf temp
@@ -212,14 +246,8 @@ function cleanUp() {
 function doManual() {
     setVAR
     install_init_manual
-    if [ $syncType == statesync ] || [ $syncType == s ]; then
-        echo "We are state syncing"
-        queryRPC
-    elif [ $syncType == snapshot ] || [ $syncType == snap ]; then
-        echo "We will download the snapshot"
-    else 
-        echo "We are not syncing"
-    fi
+    syncNode
+    setPeerSettings
 }
 
 function doRegistry() {
@@ -235,6 +263,7 @@ function doRegistry() {
 
 
 function doAction() {
+    setRequirements
     if [ $isChainRegistry == yes ] || [ $isChainRegistry == y ]; then
         echo "We are using the chain registry"
         doRegistry
