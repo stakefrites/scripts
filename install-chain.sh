@@ -123,29 +123,20 @@ function setMiscVAR() {
     } >> "$HOME/.bashrc"
 }
 
-function getChainRepo() {
-    gitRepo=$(jq -r ".codebase.git_repo" "$DIR/$myChainReg/chain.json")
-    gitRepoVer=$(jq -r ".codebase.recommended_version" "$DIR/$myChainReg/chain.json")
-    git clone "$gitRepo.git"
-    gitName=$(basename "$gitRepo")
-    cd "$gitName"
-    git checkout "$gitRepoVer"
-    make install
-    $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
-}
-
-function cleanUp() {
-    rm -rf temp
-}
-
 function SetManualVAR() {
     read -p "What is the chain ID : " chainIDvar
     read -p "What is the daemon name : " daemonVAR
     read -p "What is the node home : " nodeHomeVAR
+    read -p "What is the gitrepo url : " gitRepo
+    read -p "What is the recommended version : " version
+    read -p "What is the genesis.json url (RAW) : " genesisUrl
     {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export DAEMON=$daemonVAR"
         echo "export CONFIG_HOME=$nodeHomeVAR"
+        echo "export GIT_REPO=$gitRepo"
+        echo "export VERSION=$version"
+        echo "export GENESIS_URL=$genesisUrl"
     } >> "$HOME/.bashrc"
 }
 
@@ -157,17 +148,56 @@ function setVAR() {
         echo "export identity='7817CA2B0981F769'"
     } >> "$HOME/.bashrc"
 
-    if [isChainRegistry == yes || isChainRegistry == y]; then
+    if [ $isChainRegistry == yes ] || [ $isChainRegistry == y ]; then
         echo "We are using the chain registry"
-        SetMiscVar()
+        SetMiscVar
     else 
         echo "We need some information to continue"
-        SetManualVAR()
+        SetManualVAR
     fi
     source "$HOME/.bashrc"
 }
 
-function doAction() {
+
+function getChainRepo() {
+    gitRepo=$(jq -r ".codebase.git_repo" "$DIR/$myChainReg/chain.json")
+    gitRepoVer=$(jq -r ".codebase.recommended_version" "$DIR/$myChainReg/chain.json")
+    git clone "$gitRepo.git"
+    gitName=$(basename "$gitRepo")
+    cd "$gitName"
+    git checkout "$gitRepoVer"
+    make install
+    $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
+}
+
+function install_init_manual() {
+    git clone "$gitRepo.git"
+    gitName=$(basename "$gitRepo")
+    cd "$gitName"
+    git checkout "$version"
+    make install
+    echo "INITIALIZING THE NODE....."
+    $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
+    echo "GETTING THE GENESIS FILE....."
+    wget $GENESIS_URL > $CONFIG_HOME/config/genesis.json
+    echo "Here is the node's id for sentry/validator config....."
+    echo evmosd tendermint show-node-id
+
+}
+
+
+
+
+function cleanUp() {
+    rm -rf temp
+}
+
+function doManual() {
+    setVAR
+    install_init_manual
+}
+
+function doRegistry() {
     setupChainRepo
     chooseChain
     getPeers
@@ -176,5 +206,16 @@ function doAction() {
     setVAR
     getChainRepo
     cleanUp
+}
+
+
+function doAction() {
+    if [ $isChainRegistry == yes || $isChainRegistry == y ]; then
+        echo "We are using the chain registry"
+        doRegistry
+    else 
+        echo "We need some information to continue"
+        doManual
+    fi
 }
 doAction
