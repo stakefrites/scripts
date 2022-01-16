@@ -135,10 +135,10 @@ EOF
 
 function setMount() {
     read -p "How do we call our mount point?" MOUNT
-    mkdir -p /mnt/$MOUNT
+    mkdir -p "/mnt/$MOUNT"
     mount -o discard,defaults,noatime /dev/sda /mnt/$MOUNT
     echo '/dev/sda /mnt/$MOUNT ext4 defaults,nofail,discard 0 0' | sudo tee -a /etc/fstab
-    chown $newUserCrypto:$newUserCrypto -R /mnt/$MOUNT
+    chown $newUserCrypto:$newUserCrypto -R "/mnt/$MOUNT"
 
 }
 
