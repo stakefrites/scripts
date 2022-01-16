@@ -125,6 +125,7 @@ function setMiscVAR() {
         echo "export DESCRIPTION='PoS Validators & Web3 developpers'"
         echo "export identity='7817CA2B0981F769'"
     } >> "$HOME/.bashrc"
+    source "$HOME/.bashrc"
 }
 
 function getChainRepo() {
@@ -135,6 +136,7 @@ function getChainRepo() {
     cd "$gitName"
     git checkout "$gitRepoVer"
     make install
+    $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
 }
 
 function cleanUp() {
