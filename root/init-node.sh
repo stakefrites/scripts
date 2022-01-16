@@ -6,10 +6,8 @@ pubKeyJE="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuV7zTvrJS/orxdrzZnPimY2URNIKjlB
 pubKeyNic="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC2M01axIQBOyGNmzONjYvKCjQgdGOFrU4d1NVHyxo9ZtFYao6BJEYcMDj7E5oSIMcGTNd5qu+HUNgzSKcklQeVGlhgwLSAVMv6JC7Er8gFt304f7Wr+kS6W7Eeb+HQ3dV+MaG6DWYWacCYM+k0NIMHm7SMdajSeJVmIu1XWZnFkYdFY9QF5SM9j1Wm0KYrL5gS4B71ev/RjTAlwVY5b+QqIgMb/vyT51EmhR1M3hHJ1JkAUF1qyH9+1cb2h8Of3YLb+KmwyEC5U1WXyMEuZ1S0PbvX3oQRAEQN7vThtUt6Zd5tGLFtghDgh0eo3jifiX45qynEDjN9FXRfZxNAMxsrT1jkCFCuK6ZA4sQyDTejmmTgHsIsMhUDxHdbbCG5TmC3InJrOZmBB7JanR6AsKBB3ticG8v+WCWPWtgIVDdlhj3ZWxkX/WtORqR1mWA6PMHmOOp67PvkHIX8Q1HuupceCME7oLGV6zJkZp+fnzbrqcwTrpan6gA91pIaGCI2Kb43giOIoS2lu3n2JdyEQgRy6/zXVLjzLebeibqrn6e0guNwYNqOqZtfhRe0mAPHIGRe12dhTOzofcUrOz5jA7vXhFBxTGsmh3vLhTUMbcbOG5K0tEfFwDuiUz6f1zHz54C56pKr7zUv4hw3uOepFFSXBXLYxBkKZkTkmeGVP2SKgw=="
 profileFile="mateo-var.sh"
 
-newUserCrypto="evmos"
-#serviceName="evmosd"
+newUserCrypto="$3"
 serviceName="$2"
-#goLatestVersion="1.17.6"
 goLatestVersion="$1"
 
 function checkSudo() {
@@ -23,7 +21,7 @@ function checkSudo() {
 function checkArgs() {
     echo "[*] Check number or arguments in th cmd..."
     if [ $# -le 1 ]; then
-        echo "Not enough arguments provided..." && echo "Ex: sudo ./init-node.sh goversion servicename" && echo "Ex: sudo ./init-node.sh 1.17.6 evmosd"
+        echo "Not enough arguments provided..." && echo "Ex: sudo ./init-node.sh goversion servicename username" && echo "Ex: sudo ./init-node.sh 1.17.6 evmosd evmos"
         exit 1
     fi
 }
