@@ -38,7 +38,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install git build-essential ufw curl jq snapd wgetliblz4-tool aria2 pixz -y
+    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz -y
 }
 
 function setupLatestGO() {
@@ -122,7 +122,7 @@ function setTimezone() {
 }
 
 function setServiceFile() {
-    read -p "What is the daemon'name?" DAEMON
+    read -p "What is the daemon's name? ([desmos] tx staking ....)" DAEMON
     
 cat << EOF > /etc/systemd/system/$serviceName.service
 [Unit]

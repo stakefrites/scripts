@@ -61,6 +61,7 @@ function setRequirements() {
 function setRegistryVar() {
     setupChainRegistry
     genesisUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".genesis.genesis_url")
+    echo $genesisUrl
     rpcServer=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".apis.rpc[0].address")
     githubUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.git_repo")
     version=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.recommended_version")
