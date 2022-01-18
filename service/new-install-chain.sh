@@ -82,7 +82,7 @@ function setRegistryVar() {
     } >> "$HOME/.bashrc"
 }
 
-function SetManualVar() {
+function setManualVar() {
     read -p "What is the chain ID : " chainIDvar
     read -p "What is the daemon name : " daemonVAR
     read -p "What is the node home ($HOME/.desmos) : " nodeHomeVAR
@@ -115,10 +115,10 @@ function setVariables() {
     read -p "Are we using the chain registry? yes-y | n-no : " isChainRegistry
     if [ $isChainRegistry == yes ] || [ $isChainRegistry == y ]; then
         echo "We are using the chain registry"
-        SetRegistryVar
+        setRegistryVar
     else 
         echo "We need some information to continue"
-        SetManualVar
+        setManualVar
     fi
     source "$HOME/.bashrc"
 }
