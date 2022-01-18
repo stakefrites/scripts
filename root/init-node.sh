@@ -10,6 +10,12 @@ newUserCrypto="$3"
 serviceName="$2"
 goLatestVersion="$1"
 
+# Self deleting function at exit if needed --- voir la fin du script
+currentscript="$0"
+function customFinish {
+    echo "Securely shredding ${currentscript}"; shred -u ${currentscript};
+}
+
 function checkSudo() {
     echo "[*] Gonna check if you are root"
     if [[ $EUID -ne 0 ]]; then
@@ -32,7 +38,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install git build-essential ufw curl jq snapd -y
+    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz -y
 }
 
 function setupLatestGO() {
@@ -58,7 +64,7 @@ function setupLatestGO() {
 function setUsers() {
     # crypto user
     sudo adduser --gecos "" --home /var/lib/$newUserCrypto --disabled-password --quiet $newUserCrypto
-    chmod 0700 /var/lib/evmos
+    chmod 0700 /var/lib/$newUserCrypto
     # jeen et somecanadian
     sudo adduser --gecos "" --disabled-password --quiet $newUserJE
     sudo adduser --gecos "" --disabled-password --quiet $newUserNic
@@ -188,3 +194,6 @@ function doAction() {
     askReboot
 }
 doAction "$@"
+
+# When your script is finished, exit with a call to the function, "finish":
+trap customFinish EXIT
