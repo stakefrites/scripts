@@ -80,7 +80,7 @@ function setRegistryVar() {
     export RPC_SERVER_LIST=$rpcServerList
     {
         echo "export CHAIN_ID=$chainIDvar"
-        echo "export PEERS=$peers"
+        echo "export SEEDS=$peers"
         echo "export GENESIS_URL=$genesisUrl"
         echo "export GIT_REPO=$githubUrl"
         echo "export VERSION=$version"
@@ -100,9 +100,11 @@ function setManualVar() {
     read -p "What is the genesis.json url (RAW) : " genesisUrl
     read -p "What is the RPC server we trust : " RPC_SERVER
     read -p "Please paste the peers list : " peers
+    read -p "Please paste the seeds list : " seeds
     export DAEMON=$daemonVAR
     export CONFIG_HOME=$nodeHomeVAR
     export PEERS=$peers
+    export SEEDS=$seeds
     export CHAIN_ID=$chainIDvar
     export GIT_REPO=$gitRepo
     export VERSION=$version
@@ -112,6 +114,7 @@ function setManualVar() {
     {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export PEERS=$peers"
+        echo "export SEEDS=$seeds"
         echo "export DAEMON=$daemonVAR"
         echo "export CONFIG_HOME=$nodeHomeVAR"
         echo "export GIT_REPO=$gitRepo"
@@ -169,7 +172,7 @@ function installBinaries() {
     git clone "${GIT_REPO}.git"
     gitName=$(basename "$GIT_REPO")
     cd "$gitName"
-    git checkout "$VERSION"
+    git checkout "v$VERSION"
     make install
 }
 
@@ -180,15 +183,16 @@ function showNodeId() {
 
 
 function queryRPC() {
+    dasel put string -f $CONFIG_HOME/config/config.toml .statesync.enable true
     echo "Querying the RPC server....."
     LAST_HEIGHT=$(wget -qO- $RPC_SERVER/commit | jq '.result.signed_header.header.height | tonumber')
     TRUSTED_HEIGHT=$((LAST_HEIGHT-250))
-    TRUSTED_HASH=$(wget -qO- $RPC_SERVER/commit?height=$TRUSTED_HEIGHT| jq .result.signed_header.commit.block_id.hash)
+    TRUSTED_HASH=$(wget -qO- $RPC_SERVER/commit?height=$TRUSTED_HEIGHT| jq -r .result.signed_header.commit.block_id.hash)
     echo "trust_hash=$TRUSTED_HASH"
     echo "trust_height= $TRUSTED_HEIGHT"
     dasel put int -f $CONFIG_HOME/config/config.toml .statesync.trust_height $TRUSTED_HEIGHT
     dasel put string -f $CONFIG_HOME/config/config.toml .statesync.trust_hash $TRUSTED_HASH
-    dasel put string -f $CONFIG_HOME/config/config.toml .statesync.rpc_servers "$RPC_SERVER,$RPC_SERVER"
+    #dasel put string -f $CONFIG_HOME/config/config.toml .statesync.rpc_servers --format "{{ select $RPC_SERVER }},{{ select $RPC_SERVER }}"
 }
 
 function setPeerSettings() {
@@ -197,6 +201,7 @@ function setPeerSettings() {
     if [ $nodeType == sentry ] || [ $nodeType == s ]; then
         echo "We are setting up a sentry node....."
         dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.pex true
+        dasel put string -f $CONFIG_HOME/config/config.toml .p2p.seeds $SEEDS
         dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.addr_book_strict false
     elif [ $nodeType == validator ] || [ $nodeType == v ]; then
         echo "We are setting up a validator node....."
