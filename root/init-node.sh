@@ -57,7 +57,7 @@ function setupLatestGO() {
         echo "export GO111MODULE=on"
         echo "export GOPATH=\$HOME/go"
         echo "export GOBIN=$GOBIN"
-        echo "export PATH=$GOBIN:$GOROOT:$PATH"
+        echo "export PATH=$GOBIN:$GOROOT:/usr/local/go/bin:$PATH"
     } >>/etc/profile.d/$profileFile
 }
 
