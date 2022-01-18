@@ -192,7 +192,7 @@ function queryRPC() {
     echo "trust_height= $TRUSTED_HEIGHT"
     dasel put int -f $CONFIG_HOME/config/config.toml .statesync.trust_height $TRUSTED_HEIGHT
     dasel put string -f $CONFIG_HOME/config/config.toml .statesync.trust_hash $TRUSTED_HASH
-    #dasel put string -f $CONFIG_HOME/config/config.toml .statesync.rpc_servers --format "{{ select $RPC_SERVER }},{{ select $RPC_SERVER }}"
+    dasel put string -f $CONFIG_HOME/config/config.toml .statesync.rpc_servers $RPC_SERVER_LIST
 }
 
 function setPeerSettings() {
