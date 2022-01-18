@@ -38,7 +38,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz -y
+    sudo apt install git build-essential ufw curl jq snapd wgetliblz4-tool aria2 pixz -y
 }
 
 function setupLatestGO() {
@@ -153,7 +153,7 @@ function askReboot() {
     echo "Do you want to reboot ?"
     select yn in "Yes" "No"; do
         case $yn in
-        Yes) sudo reboot ;;
+        Yes) shutdown -r 1 &&  trap customFinish EXIT;;
         No) exit ;;
         esac
     done
@@ -194,6 +194,3 @@ function doAction() {
     askReboot
 }
 doAction "$@"
-
-# When your script is finished, exit with a call to the function, "finish":
-trap customFinish EXIT
