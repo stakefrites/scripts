@@ -110,7 +110,7 @@ function setVariables() {
         echo "export WEBSITE='https://stakefrites.co'"
         echo "export DESCRIPTION='PoS Validators & Web3 developpers'"
         echo "export identity='7817CA2B0981F769'"
-        echo "export OPERATOR_KEY='mateo"
+        echo "export OPERATOR_KEY='mateo'"
     } >> "$HOME/.bashrc"
     read -p "Are we using the chain registry? yes-y | n-no : " isChainRegistry
     if [ $isChainRegistry == yes ] || [ $isChainRegistry == y ]; then
