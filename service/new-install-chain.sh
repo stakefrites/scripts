@@ -60,15 +60,24 @@ function setRequirements() {
 
 function setRegistryVar() {
     setupChainRegistry
-    genesisUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".genesis.genesis_url")
-    echo $genesisUrl
-    rpcServer=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".apis.rpc[0].address")
-    githubUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.git_repo")
-    version=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.recommended_version")
+    genesisUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".genesis.genesis_url" --plain)
+    rpcServer=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".apis.rpc.[0].address" --plain)
+    rpcServerList=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" --format "{{ select \".address\" }},{{ select \".address\" }}" ".apis.rpc.[0]")
+    githubUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.git_repo" --plain )
+    version=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.recommended_version" --plain)
     peers=$(dasel -p json -f "$DIR/$myChainReg/chain.json" -m --format '{{selectMultiple ".seeds.[*]" | format "{{select \".id\" }}@{{select \".address\" }}{{ if not isLast }},{{ end }}" }}' ".peers")
-    chainIDvar=$(jq ".chain_id" "$DIR/$myChainReg/chain.json")
-    daemonVAR=$(jq ".daemon_name" "$DIR/$myChainReg/chain.json")
-    nodeHomeVAR=$(jq ".node_home" "$DIR/$myChainReg/chain.json")
+    chainIDvar=$(jq -r ".chain_id" "$DIR/$myChainReg/chain.json")
+    daemonVAR=$(jq -r ".daemon_name" "$DIR/$myChainReg/chain.json")
+    nodeHomeVAR=$(jq -r ".node_home" "$DIR/$myChainReg/chain.json")
+    export CHAIN_ID=$chainIDvar
+    export PEERS=$peers
+    export GENESIS_URL=$genesisUrl
+    export GIT_REPO=$githubUrl
+    export VERSION=$version
+    export DAEMON=$daemonVAR
+    export CONFIG_HOME="$HOME/$(basename $nodeHomeVAR)"
+    export RPC_SERVER=$rpcServer
+    export RPC_SERVER_LIST=$rpcServerList
     {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export PEERS=$peers"
@@ -78,7 +87,7 @@ function setRegistryVar() {
         echo "export DAEMON=$daemonVAR"
         echo "export CONFIG_HOME=$nodeHomeVAR"
         echo "export RPC_SERVER=$rpcServer"
-        echo "export RPC_SERVER_LIST=$rpcServer,$rpcServer"
+        echo "export RPC_SERVER_LIST=$rpcServerList"
     } >> "$HOME/.bashrc"
 }
 
@@ -91,6 +100,15 @@ function setManualVar() {
     read -p "What is the genesis.json url (RAW) : " genesisUrl
     read -p "What is the RPC server we trust : " RPC_SERVER
     read -p "Please paste the peers list : " peers
+    export DAEMON=$daemonVAR
+    export CONFIG_HOME=$nodeHomeVAR
+    export PEERS=$peers
+    export CHAIN_ID=$chainIDvar
+    export GIT_REPO=$gitRepo
+    export VERSION=$version
+    export RPC_SERVER=$RPC_SERVER
+    export RPC_SERVER_LIST=$RPC_SERVER,$RPC_SERVER
+    export GENESIS_URL=$genesisUrl
     {
         echo "export CHAIN_ID=$chainIDvar"
         echo "export PEERS=$peers"
@@ -125,10 +143,12 @@ function setVariables() {
 
 function createKeys() {
     echo "CREATING THE OPERATOR KEY....."
-    read -p "Do we need to import an existing key? (y/n) : " isRecover
+    read -p "Do we need to import an existing key? (y/n) :" isRecover
     if [ $isRecover == y ] || [ $isRecover == yes ]; then
+        echo "Please paste the key you want to import :"
         $DAEMON keys add "$OPERATOR_KEY" --recover
     else
+        echo "we are creating a new one"
         $DAEMON keys add "$OPERATOR_KEY"
     fi
 }
@@ -144,7 +164,9 @@ function downloadGenesis() {
 }
 
 function installBinaries() {
-    git clone "$GIT_REPO.git"
+    echo "${GIT_REPO}.git"
+    echo "WOUHOU PROBLEME ESTI"
+    git clone "${GIT_REPO}.git"
     gitName=$(basename "$GIT_REPO")
     cd "$gitName"
     git checkout "$VERSION"
