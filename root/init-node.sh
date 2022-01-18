@@ -20,7 +20,7 @@ function checkSudo() {
 
 function checkArgs() {
     echo "[*] Check number or arguments in th cmd..."
-    if [ $# -le 1 ]; then
+    if [ $# -le 2 ]; then
         echo "Not enough arguments provided..." && echo "Ex: sudo ./init-node.sh goversion servicename username" && echo "Ex: sudo ./init-node.sh 1.17.6 evmosd evmos"
         exit 1
     fi
@@ -136,9 +136,9 @@ EOF
 function setMount() {
     read -p "How do we call our mount point?" MOUNT
     mkdir -p "/mnt/$MOUNT"
-    mount -o discard,defaults,noatime /dev/sda /mnt/$MOUNT
-    echo '/dev/sda /mnt/$MOUNT ext4 defaults,nofail,discard 0 0' | sudo tee -a /etc/fstab
-    chown $newUserCrypto:$newUserCrypto -R "/mnt/$MOUNT"
+    mount -o discard,defaults,noatime /dev/sda "/mnt/$MOUNT"
+    echo "/dev/sda /mnt/$MOUNT ext4 defaults,nofail,discard 0 0" | sudo tee -a /etc/fstab
+    chown "$newUserCrypto:$newUserCrypto" -R "/mnt/$MOUNT"
 
 }
 
