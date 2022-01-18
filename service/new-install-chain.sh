@@ -84,7 +84,7 @@ function setRegistryVar() {
 function SetManualVar() {
     read -p "What is the chain ID : " chainIDvar
     read -p "What is the daemon name : " daemonVAR
-    read -p "What is the node home : " nodeHomeVAR
+    read -p "What is the node home ($HOME/.desmos) : " nodeHomeVAR
     read -p "What is the gitrepo url : " gitRepo
     read -p "What is the recommended version : " version
     read -p "What is the genesis.json url (RAW) : " genesisUrl
@@ -163,9 +163,9 @@ function queryRPC() {
     TRUSTED_HASH=$(wget -qO- $RPC_SERVER/commit?height=$TRUSTED_HEIGHT| jq .result.signed_header.commit.block_id.hash)
     echo "trust_hash=$TRUSTED_HASH"
     echo "trust_height= $TRUSTED_HEIGHT"
-    dasel put int -f $HOME/.desmos/config/config.toml .statesync.trust_height $TRUSTED_HEIGHT
-    dasel put string -f $HOME/.desmos/config/config.toml .statesync.trust_hash $TRUSTED_HASH
-    dasel put string -f $HOME/.desmos/config/config.toml .statesync.rpc_servers "$RPC_SERVER,$RPC_SERVER"
+    dasel put int -f $CONFIG_HOME/config/config.toml .statesync.trust_height $TRUSTED_HEIGHT
+    dasel put string -f $CONFIG_HOME/config/config.toml .statesync.trust_hash $TRUSTED_HASH
+    dasel put string -f $CONFIG_HOME/config/config.toml .statesync.rpc_servers "$RPC_SERVER,$RPC_SERVER"
 }
 
 function setPeerSettings() {
@@ -173,12 +173,12 @@ function setPeerSettings() {
     read -p "What type of node are we setting up? sentry-s | v-validator | a-archive: " nodeType
     if [ $nodeType == sentry ] || [ $nodeType == s ]; then
         echo "We are setting up a sentry node....."
-        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.pex true
-        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.addr_book_strict false
+        dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.pex true
+        dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.addr_book_strict false
     elif [ $nodeType == validator ] || [ $nodeType == v ]; then
         echo "We are setting up a validator node....."
-        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.pex false
-        dasel put bool -f $HOME/.desmos/config/config.toml .p2p.addr_book_strict false
+        dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.pex false
+        dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.addr_book_strict false
     else
         echo "We are setting up an archive node....."
     fi
@@ -191,6 +191,7 @@ function syncNode() {
         queryRPC
     elif [ $syncType == snapshot ] || [ $syncType == snap ]; then
         echo "We will download the snapshot"
+        # to implement
     else 
         echo "We are not syncing"
     fi
