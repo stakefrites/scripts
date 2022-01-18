@@ -191,10 +191,22 @@ function syncNode() {
         queryRPC
     elif [ $syncType == snapshot ] || [ $syncType == snap ]; then
         echo "We will download the snapshot"
-        # to implement
+        downloadSnapshot
     else 
         echo "We are not syncing"
     fi
+}
+
+function downloadSnapshot() {
+    echo "We are downloading the snapshot....."
+    read -p "What is the snapshot url? : " snapshotUrl
+    cd $CONFIG_HOME
+    wget $snapshotUrl
+    filename=$(basename "$snapshotUrl")
+    echo "We will untar the snapshot"
+    tar -I'pixz' -xvf $filename --strip-components=4
+    echo "Untar done"
+ 
 }
 
 function cleanUp() {
