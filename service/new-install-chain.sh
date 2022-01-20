@@ -63,7 +63,8 @@ function setRegistryVar() {
     genesisUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".genesis.genesis_url" --plain)
     rpcServer=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".apis.rpc.[0].address" --plain)
     rpcServerList=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" --format "{{ select \".address\" }},{{ select \".address\" }}" ".apis.rpc.[0]")
-    githubUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.git_repo" --plain )
+    # sed is checking for git url bug (ex: akash)
+    githubUrl=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.git_repo" --plain | sed -e "s/[[:punct:]]$//")
     version=$(dasel select -p json -f "$DIR/$myChainReg/chain.json" ".codebase.recommended_version" --plain)
     peers=$(dasel -p json -f "$DIR/$myChainReg/chain.json" -m --format '{{selectMultiple ".seeds.[*]" | format "{{select \".id\" }}@{{select \".address\" }}{{ if not isLast }},{{ end }}" }}' ".peers")
     chainIDvar=$(jq -r ".chain_id" "$DIR/$myChainReg/chain.json")
@@ -172,7 +173,14 @@ function installBinaries() {
     git clone "${GIT_REPO}.git"
     gitName=$(basename "$GIT_REPO")
     cd "$gitName"
-    git checkout "v$VERSION"
+    # checking VERSION format
+    first_char="$(printf '%s' "$VERSION" | cut -c1)"
+    if [ "$first_char" = v ]; then
+        echo 'starts with v' >/dev/null
+    else
+        VERSION="v$VERSION"
+    fi
+    git checkout "$VERSION"
     make install
 }
 
