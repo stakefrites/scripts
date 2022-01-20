@@ -150,7 +150,18 @@ function setMount() {
     mount -o discard,defaults,noatime /dev/sda "/mnt/$MOUNT"
     echo "/dev/sda /mnt/$MOUNT ext4 defaults,nofail,discard 0 0" | sudo tee -a /etc/fstab
     chown "$newUserCrypto:$newUserCrypto" -R "/mnt/$MOUNT"
+}
 
+function symlinkMount() {
+    line
+    echo "[*] Moving the config folder to the volume"
+    mv /var/lib/$newUserCrypto/.$serviceName /mnt/$newUserCrypto/
+    line
+    echo "[*] Creating symlink in the service's home directory"
+    ln -s /mnt/$newUserCrypto/.$serviceName /var/lib/$newUserCrypto/.$serviceName
+    line
+    echo "[*] Updating the services's persmissions"
+    chown -R $newUserCrypto:$newUserCrypto /var/lib/$newUserCrypto
 }
 
 function askReboot() {
@@ -185,6 +196,7 @@ function doAction() {
     line
     echo "[*] Configuring the mount point"
     setMount
+    symlinkMount
     line
     echo "[*] Setting SSHkeys"
     setupSSHkeys
