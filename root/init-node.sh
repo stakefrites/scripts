@@ -88,6 +88,7 @@ function sudoersFu() {
         echo "$newUserCrypto ALL= NOPASSWD: /usr/bin/systemctl restart $serviceName"
         echo "$newUserCrypto ALL= NOPASSWD: /usr/bin/systemctl enable $serviceName"
         echo "$newUserCrypto ALL= NOPASSWD: /usr/bin/systemctl disable $serviceName"
+        echo "$newUserCrypto ALL= NOPASSWD: /usr/bin/journalctl -u $serviceName -f"
     } >>/tmp/sudoers.bak
     # Check syntax of the backup file to make sure it is correct.
     sudo visudo -cf /tmp/sudoers.bak
