@@ -21,9 +21,11 @@ function customFinish {
 }
 
 function checkSudo() {
-    echo "[*] Gonna check if you are root"
+    echo "[*] Validating root permissions"
+    line
     if [[ $EUID -ne 0 ]]; then
         echo "[x] This script must be run as root... Configuration need root priv... Quitting!"
+        line
         exit 1
     fi
 }
@@ -42,7 +44,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz -y
+    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz -y
 }
 
 function setupLatestGO() {
@@ -154,8 +156,8 @@ function setMount() {
 
 function symlinkMount() {
     line
-    echo "[*] Moving the config folder to the volume"
-    mv /var/lib/$newUserCrypto/.$serviceName /mnt/$newUserCrypto/
+    echo "[*] Creating  config folder to the volume"
+    mkdir /mnt/$newUserCrypto/.$serviceName
     line
     echo "[*] Creating symlink in the service's home directory"
     ln -s /mnt/$newUserCrypto/.$serviceName /var/lib/$newUserCrypto/.$serviceName
@@ -169,7 +171,7 @@ function askReboot() {
     echo "Do you want to reboot ?"
     select yn in "Yes" "No"; do
         case $yn in
-        Yes) shutdown -r 1 &&  trap customFinish EXIT;;
+        Yes) shutdown &&  trap customFinish EXIT;;
         No) exit ;;
         esac
     done
