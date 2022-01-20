@@ -13,6 +13,10 @@ myChainReg="chain-registry"
 # current script dir
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+function line() {
+    echo "--------------------------------------------------------------------------------"
+}
+
 function setupChainRegistry() {
     mkdir temp
     cd temp
@@ -169,7 +173,6 @@ function downloadGenesis() {
 
 function installBinaries() {
     echo "${GIT_REPO}.git"
-    echo "WOUHOU PROBLEME ESTI"
     git clone "${GIT_REPO}.git"
     gitName=$(basename "$GIT_REPO")
     cd "$gitName"
@@ -222,11 +225,14 @@ function setPeerSettings() {
 
 function syncNode() {
     read -p "What type of sync are we doig? statesync-s | snapshot-snap | genesis-g : " syncType
+    line
      if [ $syncType == statesync ] || [ $syncType == s ]; then
         echo "We are state syncing"
+        line
         queryRPC
     elif [ $syncType == snapshot ] || [ $syncType == snap ]; then
         echo "We will download the snapshot"
+        line
         downloadSnapshot
     else 
         echo "We are not syncing"
@@ -236,6 +242,7 @@ function syncNode() {
 function downloadSnapshot() {
     echo "We are downloading the snapshot....."
     read -p "What is the snapshot url? : " snapshotUrl
+    line
     cd $CONFIG_HOME
     wget $snapshotUrl
     filename=$(basename "$snapshotUrl")
@@ -252,16 +259,38 @@ function cleanUp() {
 
 
 function doAction() {
+    echo "[*] Setting requirements"
+    line
     setRequirements
+    echo "[*] Setting variables"
+    line
     setVariables
+    echo "[*] Instaling binaries"
+    line
     installBinaries
+    echo "[*] Initializing node"
+    line
     initNode
+    echo "[*] Creating keys"
+    line
     createKeys
+    echo "[*] Downloading genesis file"
+    line
     downloadGenesis
+    echo "[*] Setting the peer settings"
+    line
     setPeerSettings
+    echo "[*] Setting up the sync configuration"
+    line
     syncNode
+    echo "[*] Here is the node id"
+    line
     showNodeId
+    echo "[*] Cleaning up ..."
+    line
     cleanUp
+    echo "[*] Setting requirements"
+    line
 }
 
 doAction

@@ -3,7 +3,11 @@
 
 ## TO-DO
 - Implement Cosmovisor setup
-- Implement Snapshot download
+    - https://docs.cosmos.network/master/run-node/cosmovisor.html
+    - Add the service file 
+    - move binaries
+- Implement Snapshot download [in progress]
+    - Akash didn't work
 - Add a config.toml file that will configure basic settings
 
 

@@ -10,6 +10,10 @@ newUserCrypto="$3"
 serviceName="$2"
 goLatestVersion="$1"
 
+function line() {
+    echo "--------------------------------------------------------------------------------"
+}
+
 # Self deleting function at exit if needed --- voir la fin du script
 currentscript="$0"
 function customFinish {
@@ -162,32 +166,32 @@ function askReboot() {
 function doAction() {
     checkSudo
     checkArgs "$@"
-    echo ""
+    line
     echo "[*] Setting Requirements"
     setRequirements
-    echo ""
+    line
     echo "[*] Setting GO"
     setupLatestGO
-    echo ""
+    line
     echo "[*] Setting Users"
     setUsers
-    echo ""
+    line
     echo "[*] Setting Sudoers"
     sudoersFu
-    echo ""
+    line
     echo "[*] Setting the service file"
     setServiceFile
-    echo ""
+    line
     echo "[*] Configuring the mount point"
     setMount
-    echo ""
+    line
     echo "[*] Setting SSHkeys"
     setupSSHkeys
     rootLogin
-    echo ""
+    line
     echo "[*] Setting Timezone"
     setTimezone
-    echo ""
+    line
     echo "The END"
     echo "Please go delete init-node.sh script when re-logging in the /root dir"
     echo "Note: You won't be able to login with root again"
