@@ -220,6 +220,11 @@ function setPeerSettings() {
         dasel put bool -f $CONFIG_HOME/config/config.toml .p2p.addr_book_strict false
     else
         echo "We are setting up an archive node....."
+        dasel put bool -f $CONFIG_HOME/config/app.toml .api.enable true
+        # Le int va p-e bugger, valider avec la doc dasel
+        dasel put int -f $CONFIG_HOME/config/app.toml .state-sync.snapshot-interval 100
+        dasel put int -f $CONFIG_HOME/config/app.toml .state-sync.snapshot-keep-recent 5
+        dasel put string -f $CONFIG_HOME/config/app.toml .pruning "nothing"
     fi
 }
 

@@ -1,0 +1,8 @@
+nomic declare \
+  "VlL6pGwIKcU+kM3pMVeWimIVjLaXLtF9nga1JQaZ7tM=" \
+  100000 \
+  0.05 \
+  "Stake Frites" \
+  "https://stakefrites.co" \
+  "7817CA2B0981F769" \
+  "PoS Validators and Web3 Developpers"
