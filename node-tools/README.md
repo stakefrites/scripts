@@ -19,7 +19,7 @@ tmux new -s delegate
 ```
 And start this script:
 ```
-wget https://raw.githubusercontent.com/Staketab/cosmos-tools/main/auto-withdraw-delegate/start.sh \
-&& chmod +x start.sh \
-&& ./start.sh -b BINARY -k KEY_NAME -s SLEEP_TIME -p RPC_PORT -t TG_TOKEN -c TG_CHANNEL
+wget https://raw.githubusercontent.com/stakefrites/scripts/main/node-tools/auto_with_delegate.sh \
+&& chmod +x auto_with_delegate.sh \
+&& ./auto_with_delegate.sh -b BINARY -k KEY_NAME -s SLEEP_TIME -p RPC_PORT -d DISCORD_HOOK
 ```
