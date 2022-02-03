@@ -98,7 +98,7 @@ if [ "$ANSWER" == "yes" ]; then
         sendDiscord ${MSG}
     else
         MSG=$(echo -e "${BINARY} | $(date +%F-%H-%M-%S) | Insufficient balance for delegation")
-        sendTg ${MSG}
+        sendDiscord ${MSG}
         echo "-------------------------------------------------------------------"
         echo -e "$RED Insufficient balance for delegation $NORMAL"
         echo "-------------------------------------------------------------------"
@@ -117,7 +117,7 @@ else
 fi
 }
 
-while getopts ":b:k:s:p:t:c:" o; do
+while getopts ":b:k:s:p:d:" o; do
   case "${o}" in
     b)
       b=${OPTARG}
