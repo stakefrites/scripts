@@ -1,0 +1,1 @@
+NP=$(curl -s http://localhost:26657/status | jq -r ".result.validator_info.voting_power")
