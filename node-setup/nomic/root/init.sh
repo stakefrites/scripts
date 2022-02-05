@@ -144,7 +144,7 @@ function askReboot() {
     echo "Do you want to reboot ?"
     select yn in "Yes" "No"; do
         case $yn in
-        Yes) shutdown &&  trap customFinish EXIT;;
+        Yes) sleep 5 ; reboot &&  trap customFinish EXIT;;
         No) exit ;;
         esac
     done
