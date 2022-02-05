@@ -44,7 +44,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools -y
+    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang c -y
 }
 
 function setupLatestGO() {

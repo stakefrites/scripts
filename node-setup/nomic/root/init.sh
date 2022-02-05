@@ -6,9 +6,8 @@ pubKeyJE="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuV7zTvrJS/orxdrzZnPimY2URNIKjlB
 pubKeyNic="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC2M01axIQBOyGNmzONjYvKCjQgdGOFrU4d1NVHyxo9ZtFYao6BJEYcMDj7E5oSIMcGTNd5qu+HUNgzSKcklQeVGlhgwLSAVMv6JC7Er8gFt304f7Wr+kS6W7Eeb+HQ3dV+MaG6DWYWacCYM+k0NIMHm7SMdajSeJVmIu1XWZnFkYdFY9QF5SM9j1Wm0KYrL5gS4B71ev/RjTAlwVY5b+QqIgMb/vyT51EmhR1M3hHJ1JkAUF1qyH9+1cb2h8Of3YLb+KmwyEC5U1WXyMEuZ1S0PbvX3oQRAEQN7vThtUt6Zd5tGLFtghDgh0eo3jifiX45qynEDjN9FXRfZxNAMxsrT1jkCFCuK6ZA4sQyDTejmmTgHsIsMhUDxHdbbCG5TmC3InJrOZmBB7JanR6AsKBB3ticG8v+WCWPWtgIVDdlhj3ZWxkX/WtORqR1mWA6PMHmOOp67PvkHIX8Q1HuupceCME7oLGV6zJkZp+fnzbrqcwTrpan6gA91pIaGCI2Kb43giOIoS2lu3n2JdyEQgRy6/zXVLjzLebeibqrn6e0guNwYNqOqZtfhRe0mAPHIGRe12dhTOzofcUrOz5jA7vXhFBxTGsmh3vLhTUMbcbOG5K0tEfFwDuiUz6f1zHz54C56pKr7zUv4hw3uOepFFSXBXLYxBkKZkTkmeGVP2SKgw=="
 profileFile="mateo-var.sh"
 
-newUserCrypto="$3"
-serviceName="$2"
-goLatestVersion="$1"
+newUserCrypto="$2"
+serviceName="$1"
 
 function line() {
     echo "--------------------------------------------------------------------------------"
@@ -32,8 +31,8 @@ function checkSudo() {
 
 function checkArgs() {
     echo "[*] Check number or arguments in th cmd..."
-    if [ $# -le 2 ]; then
-        echo "Not enough arguments provided..." && echo "Ex: sudo ./init-node.sh goversion servicename username" && echo "Ex: sudo ./init-node.sh 1.17.6 evmosd evmos"
+    if [ $# -le 1 ]; then
+        echo "Not enough arguments provided..." && echo "Ex: sudo ./init-node.sh servicename username" && echo "Ex: sudo ./init-node.sh evmosd evmos"
         exit 1
     fi
 }
@@ -44,27 +43,13 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools -y
+    sudo apt install build-essential libssl-dev pkg-config clang
 }
 
-function setupLatestGO() {
-    wget https://go.dev/dl/go"$goLatestVersion".linux-amd64.tar.gz
-    # check if old go is already there
-    if [ -d "/usr/local/go" ]; then
-        rm -rf /usr/local/go
-    fi
-    tar -C /usr/local -xzf go"$goLatestVersion".linux-amd64.tar.gz
-    rm go"$goLatestVersion".linux-amd64.tar.gz
-    # Set GOPATH
-    touch /etc/profile.d/$profileFile
-    GOBIN="\$HOME/go/bin"
-    GOROOT="\$HOME/go"
-    {
-        echo "export GO111MODULE=on"
-        echo "export GOPATH=\$HOME/go"
-        echo "export GOBIN=$GOBIN"
-        echo "export PATH=$GOBIN:$GOROOT:/usr/local/go/bin:$PATH"
-    } >>/etc/profile.d/$profileFile
+function setRust() {
+    echo "[*] Setting rust..."
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    rustup default nightly
 }
 
 function setUsers() {
@@ -148,22 +133,10 @@ EOF
 
 function setMount() {
     read -p "How do we call our mount point?" MOUNT
-    mkdir -p "/mnt/$MOUNT"
+    mkdir -p "/var/lib/$MOUNT"
     mount -o discard,defaults,noatime /dev/sda "/mnt/$MOUNT"
     echo "/dev/sda /mnt/$MOUNT ext4 defaults,nofail,discard 0 0" | sudo tee -a /etc/fstab
     chown "$newUserCrypto:$newUserCrypto" -R "/mnt/$MOUNT"
-}
-
-function symlinkMount() {
-    line
-    echo "[*] Creating  config folder to the volume"
-    mkdir /mnt/$newUserCrypto/.$serviceName
-    line
-    echo "[*] Creating symlink in the service's home directory"
-    ln -s /mnt/$newUserCrypto/.$serviceName /var/lib/$newUserCrypto/.$serviceName
-    line
-    echo "[*] Updating the services's persmissions"
-    chown -R $newUserCrypto:$newUserCrypto /var/lib/$newUserCrypto
 }
 
 function askReboot() {
@@ -184,9 +157,6 @@ function doAction() {
     echo "[*] Setting Requirements"
     setRequirements
     line
-    echo "[*] Setting GO"
-    setupLatestGO
-    line
     echo "[*] Setting Users"
     setUsers
     line
@@ -198,7 +168,6 @@ function doAction() {
     line
     echo "[*] Configuring the mount point"
     setMount
-    symlinkMount
     line
     echo "[*] Setting SSHkeys"
     setupSSHkeys

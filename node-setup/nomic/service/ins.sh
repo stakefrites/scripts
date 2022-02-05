@@ -55,6 +55,11 @@ function setupChainRegistry() {
   rm -rf "$chainFolder"
 }
 
+function setRust() {
+    echo "[*] Setting rust..."
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    rustup default nightly
+}
 
 function setRequirements() {
     echo ""
