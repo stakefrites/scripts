@@ -43,7 +43,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install build-essential libssl-dev pkg-config clang
+    sudo apt install build-essential libssl-dev pkg-config clang net-tools
 }
 
 function setRust() {
