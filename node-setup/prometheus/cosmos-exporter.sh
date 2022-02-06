@@ -7,3 +7,5 @@ wget https://github.com/solarlabsteam/cosmos-exporter/releases/download/v0.2.2/c
 --denom ulum --denom-coefficient 1000000 --bech-prefix lum --log-level debug
 
 --denom uakt --denom-coefficient 1000000 --bech-prefix akash --log-level debug
+
+--denom uhuahua --denom-coefficient 1000000 --bech-prefix chihuahua --log-level debug

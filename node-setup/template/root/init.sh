@@ -160,7 +160,7 @@ function symlinkMount() {
     mkdir /mnt/$newUserCrypto/.$serviceName
     line
     echo "[*] Creating symlink in the service's home directory"
-    ln -s /mnt/$newUserCrypto/.$serviceName /var/lib/$newUserCrypto/.$serviceName
+    ln -s /mnt/$newUserCrypto/.$serviceName /var/lib/$newUserCrypto/.$newUserCrypto
     line
     echo "[*] Updating the services's persmissions"
     chown -R $newUserCrypto:$newUserCrypto /var/lib/$newUserCrypto
