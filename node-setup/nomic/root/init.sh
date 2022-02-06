@@ -114,6 +114,7 @@ function setTimezone() {
 }
 
 function setServiceFile() {
+    line
     read -p "What is the daemon's name? ([desmos] tx staking ....)" DAEMON
     
 cat << EOF > /etc/systemd/system/$serviceName.service
@@ -122,7 +123,7 @@ Description=$serviceName service
 After=network-online.target
 [Service]
 User=$newUserCrypto
-ExecStart=/var/lib/$newUserCrypto/go/bin/$DAEMON start
+ExecStart=/var/lib/nomic/.cargo/bin/$DAEMON start
 Restart=always
 RestartSec=3
 LimitNOFILE=4096
