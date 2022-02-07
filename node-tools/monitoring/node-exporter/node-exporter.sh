@@ -7,6 +7,8 @@ cat << EOF > /etc/systemd/system/node-exporter.service
 [Unit]
 Description=Node Exporter
 After=network-online.target
+
+[Service]
 User=root
 TimeoutStartSec=0
 CPUWeight=95
