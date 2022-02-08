@@ -9,7 +9,7 @@ Description=cosmovisor
 After=network-online.target
 
 [Service]
-User=<your-user>
+User=$USER_NAME
 ExecStart=/var/lib/$USER_NAME/go/bin/cosmovisor start
 Restart=always
 RestartSec=3
