@@ -45,13 +45,11 @@ echo -e "$GREEN Enter Fees in ${COIN}.$NORMAL"
 read -p "Fees: " FEES
 FEE=${FEES}${COIN}
 VALIDATOR_ADDR=$(nomic balance | grep "address:" | cut -d" " -f2)
-CHAIN=$(${BINARY} status --node http://localhost:${RPC_PORT} 2>&1 | jq -r .NodeInfo.network)
 
 echo "-------------------------------------------------------------------"
 echo -e "$YELLOW Check you Validator data: $NORMAL"
 echo -e "$GREEN Valoper: $VALIDATOR_ADDR $NORMAL"
 echo -e "$GREEN Chain: $CHAIN $NORMAL"
-echo -e "$GREEN Coin: $COIN $NORMAL"
 echo -e "$GREEN Sleep Time: $STIME $NORMAL"
 echo "-------------------------------------------------------------------"
 echo -e "$YELLOW If your Data is right type$RED yes$NORMAL.$NORMAL"
@@ -64,7 +62,7 @@ if [ "$ANSWER" == "yes" ]; then
     echo "-------------------------------------------------------------------"
     echo -e "$RED$(date +%F-%H-%M-%S)$NORMAL $YELLOW Withdraw commission and rewards $NORMAL"
     echo "-------------------------------------------------------------------"
-    echo nomic claim | grep "raw_log\|txhash"
+    echo nomic claim
 
     sleep 1m
 
@@ -83,6 +81,7 @@ if [ "$ANSWER" == "yes" ]; then
         sleep 30s
         echo "-------------------------------------------------------------------"
         echo -e "$GREEN Balance after delegation:$NORMAL"
+        nomic balance | grep "balance:" | cut -d" " -f2
         echo ""
         echo "Delegate After:"
         nomic delegations
