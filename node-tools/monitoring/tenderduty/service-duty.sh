@@ -1,4 +1,4 @@
-read -p "What is the valcons address? (y/n) :" address
+read -p "What is the valcons address? :" address
 
 cat << EOF > /etc/systemd/system/tenderduty.service
 [Unit]
