@@ -42,7 +42,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install chrony git build-essential ufw curl jq wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config -y
+    sudo apt install nodejs npm chrony git build-essential ufw curl jq wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config -y
 }
 
 
