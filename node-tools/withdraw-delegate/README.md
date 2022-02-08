@@ -23,3 +23,11 @@ wget https://raw.githubusercontent.com/stakefrites/scripts/main/node-tools/withd
 && chmod +x auto_with_delegate.sh \
 && ./auto_with_delegate.sh -b BINARY -k KEY_NAME -s SLEEP_TIME -p RPC_PORT -d DISCORD_HOOK
 ```
+
+FOR NOM
+And start this script:
+```
+wget https://raw.githubusercontent.com/stakefrites/scripts/main/node-tools/withdraw-delegate/auto_with_delegate_nom.sh \
+&& chmod +x auto_with_delegate_nom.sh \
+&& ./auto_with_delegate_nom.sh -b nomic -s 3h -p 26657 -d https://discord.com/api/webhooks/938799022003609670/GUHElv5AZixGTNbAp-JLePH1CWms_vSsjqtINAmrOaG7h1cAXa_pzFQwm8iHeKKtjkyW
+```
