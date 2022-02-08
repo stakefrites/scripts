@@ -29,5 +29,4 @@ And start this script:
 ```
 wget https://raw.githubusercontent.com/stakefrites/scripts/main/node-tools/withdraw-delegate/auto_with_delegate_nom.sh \
 && chmod +x auto_with_delegate_nom.sh \
-&& ./auto_with_delegate_nom.sh -b nomic -s 3h -p 26657 -d https://discord.com/api/webhooks/938799022003609670/GUHElv5AZixGTNbAp-JLePH1CWms_vSsjqtINAmrOaG7h1cAXa_pzFQwm8iHeKKtjkyW
-```
+&& ./auto_with_delegate_nom.sh -b nomic -s 3h -p 26657 -d https://discord.com/api/webhooks/938475231390105620/evpZtEd-5ujX13T1K8PgZgMz-sCotimmjOHi4nFElVhCli5E-WrT3-EH1ck3AXFdDVbA
