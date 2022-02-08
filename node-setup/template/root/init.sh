@@ -44,7 +44,7 @@ function setRequirements() {
     sudo apt-get dist-upgrade -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
-    sudo apt install gcc make chrony git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang c -y
+    sudo apt install gcc make chrony git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang -y
 }
 
 function setupLatestGO() {
@@ -65,6 +65,7 @@ function setupLatestGO() {
         echo "export GOBIN=$GOBIN"
         echo "export PATH=$GOBIN:$GOROOT:/usr/local/go/bin:$PATH"
     } >>/etc/profile.d/$profileFile
+    echo "export PATH=/usr/local/go/bin:$PATH" >> /root/.bashrc
 }
 
 function setUsers() {

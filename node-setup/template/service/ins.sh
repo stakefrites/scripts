@@ -276,9 +276,9 @@ function doAction() {
     echo "[*] Initializing node"
     line
     initNode
-    echo "[*] Creating keys"
-    line
-    createKeys
+    #echo "[*] Creating keys"
+    #line
+    #createKeys
     echo "[*] Downloading genesis file"
     line
     downloadGenesis
