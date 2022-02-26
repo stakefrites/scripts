@@ -12,7 +12,31 @@ configFile="$DIR/config.json"
 profileFile="mateo-var.sh"
 
 function getVar() {
-  goVersion=$(jq -r '.goversion' "$configFile")
+  discordHook=$(jq -r ".discord_hook" "$configFile")
+  #system
+  systemVolume=$(jq -r ".node_info.volume" "$configFile")
+  languageName=$(jq -r ".system.language.name" "$configFile")
+  languageVersion=$(jq -r ".system.language.version" "$configFile")
+  # node_info
+  nodeType=$(jq -r ".node_info.type" "$configFile")
+  nodeWebsite=$(jq -r ".node_info.website" "$configFile")
+  nodeMoniker=$(jq -r ".node_info.moniker" "$configFile")
+  nodeIdentity=$(jq -r ".node_info.identity" "$configFile")
+  # sync
+  syncType=$(jq -r ".sync.type" "$configFile")
+  syncTrusted_rpc=$(jq -r ".sync.trusted_rpc" "$configFile")
+  syncSnapshot_url=$(jq -r ".sync.trusted_rpc" "$configFile")
+  # user
+  countUser=$(jq -r ".users | length" "$configFile")
+  counterUser=0
+  while [[ "$counterUser" -lt "$countUser" ]]; do
+    userName=$(jq -r ".users[$counterUser].name" "$configFile")
+    userSSH=$(jq -r ".users[$counterUser].ssh" "$configFile")
+    # insert cmd to create a user here
+    counterUser=$((counterUser + 1))
+  done
+  # monitoring
+  # stake_net
 }
 
 function line {
@@ -39,7 +63,7 @@ function setRequirements() {
   sudo apt-get dist-upgrade -y
   sudo apt-get clean all
   sudo apt-get autoremove -y
-  sudo apt install gcc make chrony git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang -y
+  sudo apt install gcc make chrony git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang httpie -y
 }
 
 function sendDiscord {
