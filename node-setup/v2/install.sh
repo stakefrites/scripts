@@ -19,6 +19,7 @@ function getVar() {
   languageVersion=$(jq -r ".system.language.version" "$configFile")
   # node_info
   nodeType=$(jq -r ".node_info.type" "$configFile")
+  nodeChain=$(jq -r ".node_info.chain" "$configFile")
   nodeWebsite=$(jq -r ".node_info.website" "$configFile")
   nodeMoniker=$(jq -r ".node_info.moniker" "$configFile")
   nodeIdentity=$(jq -r ".node_info.identity" "$configFile")
@@ -78,13 +79,13 @@ echo -e "$GREEN Install et setup GO $NORMAL"
 line
 
 function setupLatestGO() {
-  wget https://go.dev/dl/go"$goVersion".linux-amd64.tar.gz
+  wget https://go.dev/dl/go"$languageVersion".linux-amd64.tar.gz
   # check if old go is already there
   if [ -d "/usr/local/go" ]; then
     rm -rf /usr/local/go
   fi
-  tar -C /usr/local -xzf go"$goVersion".linux-amd64.tar.gz
-  rm go"$goVersion".linux-amd64.tar.gz
+  tar -C /usr/local -xzf go"$languageVersion".linux-amd64.tar.gz
+  rm go"$languageVersion".linux-amd64.tar.gz
   # Set GOPATH
   touch /etc/profile.d/$profileFile
   GOBIN="\$HOME/go/bin"
@@ -102,5 +103,64 @@ function setupLatestRust() {
     echo "[*] Setting rust..."
     curl https://sh.rustup.rs -sSf | sh -s -- -y
     rustup default nightly
+    echo
 }
 
+function installLanguage() {
+  if [[ $languageName == "go" ]]; then
+    setupLatestGO
+  elif [[ $languageName == "rust" ]]; then
+    setupLatestRust
+  else
+    echo "WTF"
+  fi
+}
+
+function setupChainRegistry() {
+  mkdir temp
+  cd temp
+  git clone https://github.com/Stake-Frites/chain-registry.git
+  cd $DIR
+  mkdir chain-registry
+  mv "temp/chain-registry/$nodeChain" "$DIR/chain-registry/$nodeChain"
+  mv "temp/chain-registry/assetlist.schema.json" "$DIR/chain-registry/assetlist.schema.json"
+  mv "temp/chain-registry/chain.schema.json" "$DIR/chain-registry/chain.schema.json"
+}
+setupChainRegistry
+
+function doAction() {
+    checkSudo
+    getVar
+    line
+    echo -e "$YELLOW [*] Setting Requirements $NORMAL"
+    setRequirements
+    line
+    echo -e "$YELLOW [*] Setting GO $NORMAL"
+    setupLatestGO
+    line
+    echo "$YELLOW [*] Setting Users $NORMAL"
+    setUsers
+    line
+    echo "$YELLOW [*] Setting Sudoers $NORMAL"
+    sudoersFu
+    line
+    echo "$YELLOW [*] Setting the service file $NORMAL"
+    setServiceFile
+    line
+    echo "$YELLOW [*] Configuring the mount point $NORMAL"
+    setMount
+    symlinkMount
+    line
+    echo "$YELLOW [*] Setting SSHkeys $NORMAL"
+    setupSSHkeys
+    rootLogin
+    line
+    echo "$YELLOW [*] Setting Timezone $NORMAL"
+    setTimezone
+    line
+    echo "The END"
+    echo "Please go delete init-node.sh script when re-logging in the /root dir"
+    echo "Note: You won't be able to login with root again"
+    askReboot
+}
+doAction
