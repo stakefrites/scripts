@@ -45,10 +45,10 @@ function line {
 }
 
 function checkSudo() {
-  echo "[*] Validating root permissions"
+  echo -e "$YELLOW [*] Validating root permissions $NORMAL"
   line
   if [[ $EUID -ne 0 ]]; then
-    echo "[x] This script must be run as root... Configuration need root priv... Quitting!"
+    echo -e "$RED [x] This script must be run as root... Configuration need root priv... Quitting! $NORMAL"
     line
     exit 1
   fi
@@ -97,4 +97,18 @@ function setupLatestGO() {
     echo "export PATH=$GOBIN:$GOROOT:/usr/local/go/bin:$PATH"
   } >>/etc/profile.d/$profileFile
   echo "export PATH=/usr/local/go/bin:$PATH" >>/root/.bashrc
+}
+
+function setupLatestRust() {
+    echo "[*] Setting rust..."
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    rustup default nightly
+}
+
+function chooseLanguage() {
+  if [[ $languageName == "go" ]]; then
+    setupLatestGO
+  elif [[ $languageName == "rust" ]]; then
+    setupLatestRust
+  fi
 }
