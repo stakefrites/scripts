@@ -14,8 +14,7 @@
     "volume": "",
     "language": {
       "version": "1.17.7",
-      "name": "go",
-      "download_url": ""
+      "name": "go"
     }
   },
   "discord_hook": "",

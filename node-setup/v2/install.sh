@@ -17,6 +17,7 @@ function getVar() {
   systemVolume=$(jq -r ".node_info.volume" "$configFile")
   languageName=$(jq -r ".system.language.name" "$configFile")
   languageVersion=$(jq -r ".system.language.version" "$configFile")
+  languageDownload_url=$(jq -r ".system.language.download_url" "$configFile")
   # node_info
   nodeType=$(jq -r ".node_info.type" "$configFile")
   nodeWebsite=$(jq -r ".node_info.website" "$configFile")
@@ -74,7 +75,7 @@ function sendDiscord {
 }
 
 line
-echo -e "$GREEN Install et setup GO $NORMAL"
+echo -e "$GREEN Install et setup Language $NORMAL"
 line
 
 function setupLatestGO() {
