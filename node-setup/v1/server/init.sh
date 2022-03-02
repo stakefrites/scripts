@@ -101,9 +101,6 @@ function setTimezone() {
 }
 
 
-
-
-
 function askReboot() {
     echo ""
     echo "Do you want to reboot ?"

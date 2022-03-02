@@ -28,15 +28,7 @@ function getVar() {
   syncType=$(jq -r ".sync.type" "$configFile")
   syncTrusted_rpc=$(jq -r ".sync.trusted_rpc" "$configFile")
   syncSnapshot_url=$(jq -r ".sync.trusted_rpc" "$configFile")
-  # user
   countUser=$(jq -r ".users | length" "$configFile")
-  counterUser=0
-  while [[ "$counterUser" -lt "$countUser" ]]; do
-    userName=$(jq -r ".users[$counterUser].name" "$configFile")
-    userSSH=$(jq -r ".users[$counterUser].ssh" "$configFile")
-    # insert cmd to create a user here
-    counterUser=$((counterUser + 1))
-  done
   # monitoring
   # stake_net
 }
@@ -71,7 +63,7 @@ function setRequirements() {
 function sendDiscord {
   if [[ ${DISCORD_HOOK} != "" ]]; then
     local discord_msg="$@"
-    curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_msg\"}" $DISCORD_HOOK -so /dev/null
+    curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_msg\"}" "$DISCORD_HOOK" -so /dev/null
   fi
 }
 
@@ -101,10 +93,10 @@ function setupLatestGO() {
 }
 
 function setupLatestRust() {
-    echo "[*] Setting rust..."
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
-    rustup default nightly
-    echo
+  echo "[*] Setting rust..."
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  rustup default nightly
+  echo
 }
 
 function installLanguage() {
@@ -129,39 +121,84 @@ function setupChainRegistry() {
 }
 setupChainRegistry
 
-function doAction() {
-    checkSudo
-    getVar
-    line
-    echo -e "$YELLOW [*] Setting Requirements $NORMAL"
-    setRequirements
-    line
-    echo -e "$YELLOW [*] Setting GO $NORMAL"
-    setupLatestGO
-    line
-    echo "$YELLOW [*] Setting Users $NORMAL"
-    setUsers
-    line
-    echo "$YELLOW [*] Setting Sudoers $NORMAL"
+
+
+
+
+
+
+function rootLogin() {
+  cat /etc/ssh/sshd_config | sed "s/PermitRootLogin yes/PermitRootLogin no/" >/etc/ssh/sshd_config.new
+  mv /etc/ssh/sshd_config /etc/ssh/sshd_config-OG.bak
+  mv /etc/ssh/sshd_config.new /etc/ssh/sshd_config
+  sudo systemctl enable ssh
+  sudo systemctl restart ssh
+}
+
+function sudoersFu() {
+  # Take a backup of sudoers file and change the backup file.
+  cp /etc/sudoers /tmp/sudoers.bak && sudo sed -i -e "s/%sudo/#%sudo/g" /tmp/sudoers.bak
+  echo "$userSSH ALL=(ALL) NOPASSWD:ALL" >>/tmp/sudoers.bak
+  # Check syntax of the backup file to make sure it is correct.
+  sudo visudo -cf /tmp/sudoers.bak
+  if [ $? -eq 0 ]; then
+    # Replace the sudoers file with the new only if syntax is correct.
+    sudo cp /tmp/sudoers.bak /etc/sudoers && sudo rm /tmp/sudoers.bak
+  else
+    echo "Could not modify /etc/sudoers file. Please do this manually." && sudo rm /tmp/sudoers.bak
+  fi
+}
+
+function setupUsers() {
+  # user
+  counterUser=0
+  while [[ "$counterUser" -lt "$countUser" ]]; do
+    userName=$(jq -r ".users[$counterUser].name" "$configFile")
+    userSSH=$(jq -r ".users[$counterUser].ssh" "$configFile")
+    # insert cmd to create a user here
+    mkdir "/home/$userName/.ssh"
+    touch "/home/$userName/.ssh/authorized_keys"
+    echo "$userSSH" >>"/home/$userName/.ssh/authorized_keys"
+    chmod 700 "/home/$userName/.ssh"
+    chown "$userName:$userName" -R" /home/$userName/.ssh"
+    # sudoers
     sudoersFu
-    line
-    echo "$YELLOW [*] Setting the service file $NORMAL"
-    setServiceFile
-    line
-    echo "$YELLOW [*] Configuring the mount point $NORMAL"
-    setMount
-    symlinkMount
-    line
-    echo "$YELLOW [*] Setting SSHkeys $NORMAL"
-    setupSSHkeys
-    rootLogin
-    line
-    echo "$YELLOW [*] Setting Timezone $NORMAL"
-    setTimezone
-    line
-    echo "The END"
-    echo "Please go delete init-node.sh script when re-logging in the /root dir"
-    echo "Note: You won't be able to login with root again"
-    askReboot
+    # counter
+    counterUser=$((counterUser + 1))
+  done
+  rootLogin
+}
+
+function setTimezone() {
+  sudo timedatectl set-timezone America/Toronto
+}
+
+function doAction() {
+  checkSudo
+  getVar
+  line
+  echo -e "$YELLOW [*] Setting Requirements $NORMAL"
+  setRequirements
+  line
+  echo -e "$YELLOW [*] Setting GO $NORMAL"
+  setupLatestGO
+  line
+  echo "$YELLOW [*] Setting the service file $NORMAL"
+  setServiceFile
+  line
+  echo "$YELLOW [*] Configuring the mount point $NORMAL"
+  setMount
+  symlinkMount
+  line
+  echo "$YELLOW [*] Setting Users $NORMAL"
+  setupUsers
+  line
+  echo "$YELLOW [*] Setting Timezone $NORMAL"
+  setTimezone
+  line
+  echo "The END"
+  echo "Please go delete init-node.sh script when re-logging in the /root dir"
+  echo "Note: You won't be able to login with root again"
+  askReboot
 }
 doAction
