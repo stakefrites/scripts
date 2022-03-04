@@ -57,7 +57,7 @@ function setRequirements() {
   sudo apt-get dist-upgrade -y
   sudo apt-get clean all
   sudo apt-get autoremove -y
-  sudo apt install gcc make chrony git build-essential ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang httpie -y
+  sudo apt install gcc make chrony git build-essential ccze tmux ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang httpie -y
 }
 
 function sendDiscord {
