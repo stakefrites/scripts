@@ -109,15 +109,12 @@ function installLanguage() {
   fi
 }
 
+
+
 function setupChainRegistry() {
   mkdir temp
   cd temp
-  git clone https://github.com/Stake-Frites/chain-registry.git
-  cd $DIR
-  mkdir chain-registry
-  mv "temp/chain-registry/$nodeChain" "$DIR/chain-registry/$nodeChain"
-  mv "temp/chain-registry/assetlist.schema.json" "$DIR/chain-registry/assetlist.schema.json"
-  mv "temp/chain-registry/chain.schema.json" "$DIR/chain-registry/chain.schema.json"
+  git clone https://github.com/stakefrites/chain-registry.git
 }
 setupChainRegistry
 
@@ -201,4 +198,4 @@ function doAction() {
   echo "Note: You won't be able to login with root again"
   askReboot
 }
-doAction
+#doAction
