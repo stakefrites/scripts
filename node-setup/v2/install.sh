@@ -118,7 +118,40 @@ function setupChainRegistry() {
 }
 setupChainRegistry
 
+# TODO
+# ADD chain variables from chain-registry
 
+function installBinaries() {
+    echo "${GIT_REPO}.git"
+    git clone "${GIT_REPO}.git"
+    gitName=$(basename "$GIT_REPO")
+    cd "$gitName"
+    # checking VERSION format
+    first_char="$(printf '%s' "$VERSION" | cut -c1)"
+    if [ "$first_char" = v ]; then
+        echo 'starts with v' >/dev/null
+    else
+        VERSION="v$VERSION"
+    fi
+    git checkout "$VERSION"
+    make install
+}
+
+
+function showNodeId() {
+    echo "Here is the node's id for sentry/validator config....."
+    echo $($DAEMON tendermint show-node-id)
+}
+
+function initNode() {
+    echo "INITIALIZING THE NODE....."
+    $DAEMON init "$MONIKER" --chain-id $CHAIN_ID
+}
+
+function downloadGenesis() {
+    echo "GETTING THE GENESIS FILE....."
+    wget $GENESIS_URL > $CONFIG_HOME/config/genesis.json
+}
 
 
 
