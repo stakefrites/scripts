@@ -53,8 +53,8 @@ line
 
 function setRequirements() {
   sudo apt-get update
-  sudo apt-get upgrade -y
-  sudo apt-get dist-upgrade -y
+  sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+  sudo DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
   sudo apt-get clean all
   sudo apt-get autoremove -y
   sudo apt install gcc make chrony git build-essential ccze tmux ufw curl jq snapd wget liblz4-tool aria2 pixz pigz net-tools libssl-dev pkg-config clang httpie -y
@@ -105,11 +105,10 @@ function installLanguage() {
   elif [[ $languageName == "rust" ]]; then
     setupLatestRust
   else
-    echo "WTF"
+    echo "Language is config file is wrong"
+    exit 1
   fi
 }
-
-
 
 function setupChainRegistry() {
   mkdir temp
@@ -117,12 +116,6 @@ function setupChainRegistry() {
   git clone https://github.com/stakefrites/chain-registry.git
 }
 setupChainRegistry
-
-
-
-
-
-
 
 function rootLogin() {
   cat /etc/ssh/sshd_config | sed "s/PermitRootLogin yes/PermitRootLogin no/" >/etc/ssh/sshd_config.new
@@ -170,6 +163,24 @@ function setTimezone() {
   sudo timedatectl set-timezone America/Toronto
 }
 
+function setServiceFile() {
+  read -p "What is the daemon's name? ([desmos] tx staking ....)" DAEMON
+
+  cat <<EOF >/etc/systemd/system/$serviceName.service
+[Unit]
+Description=$serviceName service
+After=network-online.target
+[Service]
+User=$newUserCrypto
+ExecStart=/var/lib/$newUserCrypto/go/bin/$DAEMON start
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
 function doAction() {
   checkSudo
   getVar
@@ -193,6 +204,7 @@ function doAction() {
   echo "$YELLOW [*] Setting Timezone $NORMAL"
   setTimezone
   line
+  setServiceFile
   echo "The END"
   echo "Please go delete init-node.sh script when re-logging in the /root dir"
   echo "Note: You won't be able to login with root again"
