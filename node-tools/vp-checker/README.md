@@ -20,5 +20,5 @@ And start this script:
 ```
 wget  https://raw.githubusercontent.com/stakefrites/scripts/main/node-tools/vp-checker/vp_checker.sh \
 && chmod +x vp_checker.sh \
-&& ./vp_checker.sh -b BINARY -s SLEEP_TIME -p RPC_PORT -t TG_TOKEN -c TG_CHANNEL -d DISCORD_HOOK
+&& ./vp_checker.sh -b chihuahuad -s 1h -p 26657 -d https://discord.com/api/webhooks/938799022003609670/GUHElv5AZixGTNbAp-JLePH1CWms_vSsjqtINAmrOaG7h1cAXa_pzFQwm8iHeKKtjkyW
 ```
